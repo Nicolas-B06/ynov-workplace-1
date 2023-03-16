@@ -43,7 +43,8 @@ use App\Controller\UpVoteMessageController;
         name: 'upvote_message',
         controller: UpVoteMessageController::class,
     ) ],
-    denormalizationContext: ['groups' => ['message:empty']]
+    denormalizationContext: ['groups' => ['message:empty']],
+    normalizationContext: ['groups' => ['message:empty']],
 )]
 class Message
 {
