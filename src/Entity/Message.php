@@ -31,7 +31,9 @@ use App\Controller\UpVoteMessageController;
 )]
 #[ApiResource(
     uriTemplate: '/threads/{thread_id}/messages',
-    operations: [ new GetCollection() ],
+    operations: [ new GetCollection(
+        security: "is_granted('ROLE_USER')"
+    ) ],
     uriVariables: [
         'thread_id' => new Link(toProperty: 'thread', fromClass: Thread::class),
     ],
