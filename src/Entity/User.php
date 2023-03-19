@@ -95,6 +95,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Message::class)]
     private Collection $messages;
 
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Conversation::class, orphanRemoval: true)]
+    private Collection $createdConversations;
+
+    #[ORM\OneToMany(mappedBy: 'guest', targetEntity: Conversation::class, orphanRemoval: true)]
+    private Collection $invitedConversations;
+
     public function __construct()
     {
         $this->ownedGroups = new ArrayCollection();
@@ -102,6 +108,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->groupRequests = new ArrayCollection();
         $this->threads = new ArrayCollection();
         $this->messages = new ArrayCollection();
+        $this->createdConversations = new ArrayCollection();
+        $this->invitedConversations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -338,6 +346,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($message->getOwner() === $this) {
                 $message->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getCreatedConversations(): Collection
+    {
+        return $this->createdConversations;
+    }
+
+    public function addCreatedConversation(Conversation $createdConversation): self
+    {
+        if (!$this->createdConversations->contains($createdConversation)) {
+            $this->createdConversations->add($createdConversation);
+            $createdConversation->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedConversation(Conversation $createdConversation): self
+    {
+        if ($this->createdConversations->removeElement($createdConversation)) {
+            // set the owning side to null (unless already changed)
+            if ($createdConversation->getOwner() === $this) {
+                $createdConversation->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getInvitedConversations(): Collection
+    {
+        return $this->invitedConversations;
+    }
+
+    public function addInvitedConversation(Conversation $invitedConversation): self
+    {
+        if (!$this->invitedConversations->contains($invitedConversation)) {
+            $this->invitedConversations->add($invitedConversation);
+            $invitedConversation->setGuest($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvitedConversation(Conversation $invitedConversation): self
+    {
+        if ($this->invitedConversations->removeElement($invitedConversation)) {
+            // set the owning side to null (unless already changed)
+            if ($invitedConversation->getGuest() === $this) {
+                $invitedConversation->setGuest(null);
             }
         }
 

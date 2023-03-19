@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use ApiPlatform\Symfony\EventListener\EventPriorities;
+use App\Entity\Conversation;
 use App\Entity\Group;
 use App\Entity\GroupRequest;
 use App\Entity\Message;
@@ -53,7 +54,7 @@ class SetAutomaticFieldsToEntity implements EventSubscriberInterface
      */
     public function needExtraData(mixed $entity): bool
     {
-        return $entity instanceof GroupRequest || $entity instanceof Group || $entity instanceof Thread || $entity instanceof Message;
+        return $entity instanceof GroupRequest || $entity instanceof Group || $entity instanceof Thread || $entity instanceof Message || $entity instanceof Conversation;
     }
 
     /**
@@ -80,7 +81,11 @@ class SetAutomaticFieldsToEntity implements EventSubscriberInterface
                 $entity->setSlug($slugger->slug($entity->getTitle()));
                 break;
             case Message::class:
-                /** @var Thread $entity */
+                /** @var Message $entity */
+                $entity->setOwner($user);
+                break;
+            case Conversation::class:
+                /** @var Conversation $entity */
                 $entity->setOwner($user);
                 break;
         }
@@ -95,7 +100,7 @@ class SetAutomaticFieldsToEntity implements EventSubscriberInterface
                 $entity->setSlug($slugger->slug($entity->getTitle()));
                 break;
             case Message::class:
-                /** @var Thread $entity */
+                /** @var Message $entity */
                 $entity->setModifiedAt(new \DateTime('now'));
                 $entity->setHasBeenEdited(true);
                 break;
