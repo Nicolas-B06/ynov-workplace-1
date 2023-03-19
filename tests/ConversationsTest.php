@@ -8,23 +8,29 @@ class ConversationsTest extends AbstractTest
 {
     public function testPostConversation()
     {
-        static::createClient()->request('POST', '/api/users', ['json' => [
+        $client = static::createClient();
+        $client->disableReboot();
+        $client->request('POST', '/api/users', ['json' => [
             'nickname' => 'bogossDu06',
             'email' => 'machin@domain.com',
             'plainPassword' => 'toto1234',
         ]]);
 
-        $this->assertResponseIsSuccessful();
-
-        $token = $this->getToken([
+        $response = $client->request('POST', '/auth', ['json' => [
             'email' => 'machin@domain.com',
             'password' => 'toto1234',
-        ]);
+        ]]);
+        $this->assertResponseIsSuccessful();
 
-        static::createClientWithCredentials($token)->request('POST', '/api/conversations', ['json' => [
+        $data = $response->toArray();
+        $token = $data['token'];
+
+        $client->setDefaultOptions(['headers' => ['authorization' => 'Bearer ' . $token]]);
+
+        $client->request('POST', '/api/conversations', ['json' => [
             'guest' => '/api/users/1',
         ]]);
 
-        $this->assertEquals('test', $token);
+        $this->assertResponseStatusCodeSame(201);
     }
 }
