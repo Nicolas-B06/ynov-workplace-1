@@ -101,6 +101,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'guest', targetEntity: Conversation::class, orphanRemoval: true)]
     private Collection $invitedConversations;
 
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: PrivateMessage::class)]
+    private Collection $privateMessages;
+
     public function __construct()
     {
         $this->ownedGroups = new ArrayCollection();
@@ -110,6 +113,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->messages = new ArrayCollection();
         $this->createdConversations = new ArrayCollection();
         $this->invitedConversations = new ArrayCollection();
+        $this->privateMessages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -406,6 +410,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($invitedConversation->getGuest() === $this) {
                 $invitedConversation->setGuest(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PrivateMessage>
+     */
+    public function getPrivateMessages(): Collection
+    {
+        return $this->privateMessages;
+    }
+
+    public function addPrivateMessage(PrivateMessage $privateMessage): self
+    {
+        if (!$this->privateMessages->contains($privateMessage)) {
+            $this->privateMessages->add($privateMessage);
+            $privateMessage->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removePrivateMessage(PrivateMessage $privateMessage): self
+    {
+        if ($this->privateMessages->removeElement($privateMessage)) {
+            // set the owning side to null (unless already changed)
+            if ($privateMessage->getOwner() === $this) {
+                $privateMessage->setOwner(null);
             }
         }
 
