@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Controller\GetConversationCollectionController;
 use App\Controller\GetConversationController;
+use App\Controller\PostConversationController;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ConversationRepository::class)]
@@ -21,7 +22,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new GetCollection(controller: GetConversationCollectionController::class),
         new Get(controller: GetConversationController::class),
-        new Post(),
+        new Post(controller: PostConversationController::class),
         new Delete(security: "is_granted('ROLE_ADMIN') or object.getOwner() == user")
     ],
     normalizationContext: ['groups' => ['conversation:read']],
