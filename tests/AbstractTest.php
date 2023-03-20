@@ -12,39 +12,60 @@ abstract class AbstractTest extends ApiTestCase
 
   use RefreshDatabaseTrait;
 
-  public function setUp(): void
+  public function logIn(Client &$client)
   {
-    self::bootKernel();
-  }
-
-  protected function createClientWithCredentials($token = null): Client
-  {
-    $token = $token ?: $this->getToken();
-
-    return static::createClient([], ['headers' => ['authorization' => 'Bearer ' . $token]]);
-  }
-
-  /**
-   * Use other credentials if needed.
-   */
-  protected function getToken($body = []): string
-  {
-    if ($this->token) {
-      return $this->token;
-    }
-
-    $client = static::createClient();
-    $client->disableReboot();
-
-    $response = $client->request('POST', '/auth', ['json' => $body ?: [
-      'email' => 'test@test.com',
-      'password' => 'test',
+    $client->request('POST', '/api/users', ['json' => [
+      'nickname' => 'bogossDu06',
+      'email' => 'machin@domain.com',
+      'plainPassword' => 'toto1234',
     ]]);
-
     $this->assertResponseIsSuccessful();
-    $data = $response->toArray();
-    $this->token = $data['token'];
 
-    return $data['token'];
+    $response = $client->request('POST', '/auth', ['json' => [
+      'email' => 'machin@domain.com',
+      'password' => 'toto1234',
+    ]]);
+    $this->assertResponseIsSuccessful();
+
+    $data = $response->toArray();
+    $token = $data['token'];
+
+    $client->setDefaultOptions(['headers' => ['authorization' => 'Bearer ' . $token]]);
   }
+
+  // public function setUp(): void
+  // {
+  //   self::bootKernel();
+  // }
+
+  // protected function createClientWithCredentials($token = null): Client
+  // {
+  //   $token = $token ?: $this->getToken();
+
+  //   return static::createClient([], ['headers' => ['authorization' => 'Bearer ' . $token]]);
+  // }
+
+  // /**
+  //  * Use other credentials if needed.
+  //  */
+  // protected function getToken($body = []): string
+  // {
+  //   if ($this->token) {
+  //     return $this->token;
+  //   }
+
+  //   $client = static::createClient();
+  //   $client->disableReboot();
+
+  //   $response = $client->request('POST', '/auth', ['json' => $body ?: [
+  //     'email' => 'test@test.com',
+  //     'password' => 'test',
+  //   ]]);
+
+  //   $this->assertResponseIsSuccessful();
+  //   $data = $response->toArray();
+  //   $this->token = $data['token'];
+
+  //   return $data['token'];
+  // }
 }
