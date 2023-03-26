@@ -3,7 +3,6 @@
 namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\Repository\UserRepository;
 
 class ConversationsTest extends ApiTestCase
 {
@@ -27,12 +26,8 @@ class ConversationsTest extends ApiTestCase
         $token = $data['token'];
         $client->setDefaultOptions(['headers' => ['authorization' => 'Bearer ' . $token]]);
 
-        // We need this to get a valid IRI
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $user = $userRepository->firstUser();
-
         $client->request('POST', '/api/conversations', ['json' => [
-            'guest' => '/api/users/' . $user->getId(),
+            'guest' => '/api/users/1',
         ]]);
 
         $this->assertResponseStatusCodeSame(201);

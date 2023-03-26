@@ -56,17 +56,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
-    /**
-     * Used to get first available user (mainly for test purposes)
-     */
-    public function firstUser(): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getSingleResult();
-    }
-
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */
